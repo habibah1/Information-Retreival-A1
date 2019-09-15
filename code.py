@@ -5,6 +5,7 @@ import os
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
+import mmap
 
 
 def hasNumbers(inputString):
@@ -45,6 +46,7 @@ for r, d, f in os.walk(path):
             files.append(os.path.join(r, file))
 data=""
 i=1
+
 docfile = open("docids.txt", "w",encoding="utf8",errors='ignore') # This is the docids file for all the doc names and their ids
 for f in files:
     with open(f,encoding="utf8",errors='ignore') as file:
@@ -74,34 +76,16 @@ chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
 text = '\n'.join(chunk for chunk in chunks if chunk)
 
 ########################################################################
-
 #tokenize all the words using the function defined above
 myres = count_words(text)
-########################################################################
 
 
 ########################################################################
-
-# put the tokenids in the file here
-termfile = open("termids.txt", "w",encoding="utf8",errors='ignore')
-for i, val in enumerate(myres):
-        termfile.write(str(i))
-        termfile.write("    ")
-        termfile.write(val)
-        termfile.write("\n")
-
-termfile.close()
-
-########################################################################
-
 # Delete all the stop words
-
 stop_words = stopwords.words('stoplist.txt')
 myres = [x for x in myres if not x in stop_words]
 
 ########################################################################
-
-
 # Do the stemming Snowball
 
 stemmer = SnowballStemmer('english')
@@ -112,24 +96,105 @@ for x in myres:
         stems.append(x)
 
 #print(stems)
-
 ########################################################################
+# put the tokenids in the file here
+myres = set(myres)
+my_list_of_terms = []
 
+termfile = open("termids.txt","w",encoding="utf8",errors='ignore')
+counter=1
+for i, val in enumerate(myres):
+    if(val.isalpha()== True):
+        termfile.write(str(counter))
+        termfile.write("    ")
+        my_list_of_terms.append(val)
+        termfile.write(val)
+        termfile.write("\n")
+        counter=counter+1
+
+termfile.close()
+
+
+#########################################################################
 ###CREATE THE INVERTED INDEX################
 # as 
-##TERM ID ## No of times term occured in corpus ## no of doc in which term comes ##(document id in which term comes, position of term in that doc)
+##TERM ID done
+## No of times term occured in corpus #                 SEARCH IN THE TERMIDS.TXT done
+## no of doc in which term comes  #           done
+##(document id in which term comes # position of term in that doc            dO THIS IN oNE GO
 
-exp = re.compile(r'^[\+,\-]?[0-9]{1,3}$')
-
-my_list = []
+### EXTRACTING TERM IDS
+################################################
+my_list_of_term_id = []
 with open("termids.txt", "r",encoding="utf8",errors='ignore') as f:
     lines = f.readlines()
-    print(lines)
     for line in lines:
-        if re.match(exp, line.strip()):
-            my_list.append(int(line.strip()))
+        my_list_of_term_id.append(re.findall('\d+', line ))
+
+
+# ################################################
+# ####total no of documents in which the term appears
+# counter_for_files = 0
+# list_of_count = []
+# p = 1
+# for term in my_list_of_terms:
+#     for f in files:
+#         with open(f,encoding="utf8",errors='ignore') as file:
+#             if term in file.read():
+#                 counter_for_files = counter_for_files + 1
+    
+#     if (counter_for_files == 0):
+#         counter_for_files = 1
+#     list_of_count.append(counter_for_files)
+#     p = p + 1
+#     counter_for_files = 0
+# # ########################################################
+# # #total no of times a term appears in corpus
+# mycorpus_appearence=[]
+# mycorpus_appearence_counter=0
+# for term in my_list_of_terms:
+#     for f in files:
+#         with open(f,encoding="utf8",errors='ignore') as file:
+#             data3 = file.read()
+#             for m in re.finditer(term,data3):
+#                 mycorpus_appearence_counter = mycorpus_appearence_counter + 1
+#     if (mycorpus_appearence_counter== 0):
+#         mycorpus_appearence_counter = 1
+#     mycorpus_appearence.append(mycorpus_appearence_counter)
+#     mycorpus_appearence_counter=0
+# ########################################################################
+# #finds out the terms in docs and their positions as well
+docdid=1
+lennn=len(my_list_of_terms)
+docids_plus_their_positions = []
+final_dptp = []
+a=0
+for term in my_list_of_terms:
+    for f in files:
+        with open(f,encoding="utf8",errors='ignore') as file:
+            data2 = file.read()
+            if term in data2:
+                docids_plus_their_positions.append(docdid)
+                for m in re.finditer(term,data2): 
+                    docids_plus_their_positions.append(m.start())
+        docdid = docdid + 1
+    #print(docids_plus_their_positions)
+    final_dptp.append(docids_plus_their_positions)
+    a=a+1
+    docdid=1
+
+print(final_dptp)
+
+
+################################################################
+
 
 InvertedIndexfile = open("term_index.txt","w",encoding="utf8",errors='ignore')
 
-print(my_list)
-
+# length =len(mycorpus_appearence)
+# i=1
+# for x in range(length):
+#     print(my_list_of_term_id[x])s
+#     print(mycorpus_appearence[x])
+#     print(list_of_count[x])
+    
