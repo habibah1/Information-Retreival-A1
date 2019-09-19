@@ -134,34 +134,28 @@ with open("termids.txt", "r",encoding="utf8",errors='ignore') as f:
 
 # ################################################
 # ####total no of documents in which the term appears
-# counter_for_files = 0
-# list_of_count = []
-# p = 1
-# for term in my_list_of_terms:
-#     for f in files:
-#         with open(f,encoding="utf8",errors='ignore') as file:
-#             if term in file.read():
-#                 counter_for_files = counter_for_files + 1
-    
-#     if (counter_for_files == 0):
-#         counter_for_files = 1
-#     list_of_count.append(counter_for_files)
-#     p = p + 1
-#     counter_for_files = 0
+counter_for_files = 0
+list_of_count = []
+for term in my_list_of_terms:
+    for f in files:
+        with open(f,encoding="utf8",errors='ignore') as file:
+            dataaa=file.read()
+            if term in dataaa:
+                counter_for_files = counter_for_files + 1
+    list_of_count.append(counter_for_files)
+    counter_for_files = 0
 # # ########################################################
 # # #total no of times a term appears in corpus
-# mycorpus_appearence=[]
-# mycorpus_appearence_counter=0
-# for term in my_list_of_terms:
-#     for f in files:
-#         with open(f,encoding="utf8",errors='ignore') as file:
-#             data3 = file.read()
-#             for m in re.finditer(term,data3):
-#                 mycorpus_appearence_counter = mycorpus_appearence_counter + 1
-#     if (mycorpus_appearence_counter== 0):
-#         mycorpus_appearence_counter = 1
-#     mycorpus_appearence.append(mycorpus_appearence_counter)
-#     mycorpus_appearence_counter=0
+mycorpus_appearence=[]
+mycorpus_appearence_counter=0
+for term in my_list_of_terms:
+    for f in files:
+        with open(f,encoding="utf8",errors='ignore') as file:
+            data3 = file.read()
+            for m in re.finditer(term,data3):
+                mycorpus_appearence_counter = mycorpus_appearence_counter + 1
+    mycorpus_appearence.append(mycorpus_appearence_counter)
+    mycorpus_appearence_counter=0
 # ########################################################################
 # #finds out the terms in docs and their positions as well
 docdid=1
@@ -170,6 +164,7 @@ docids_plus_their_positions = []
 final_dptp = []
 a=0
 for term in my_list_of_terms:
+    docids_plus_their_positions = []
     for f in files:
         with open(f,encoding="utf8",errors='ignore') as file:
             data2 = file.read()
@@ -182,19 +177,38 @@ for term in my_list_of_terms:
     final_dptp.append(docids_plus_their_positions)
     a=a+1
     docdid=1
-
-print(final_dptp)
-
+ #finaldptp is what you neeed
 
 ################################################################
 
 
+length =len(final_dptp)
+# for x in range(length):
+#     print(my_list_of_term_id[x],mycorpus_appearence[x],list_of_count[x],final_dptp[x])
+    
 InvertedIndexfile = open("term_index.txt","w",encoding="utf8",errors='ignore')
 
-# length =len(mycorpus_appearence)
-# i=1
 # for x in range(length):
-#     print(my_list_of_term_id[x])s
-#     print(mycorpus_appearence[x])
-#     print(list_of_count[x])
-    
+#     InvertedIndexfile.write(str(my_list_of_term_id[x]))
+#     InvertedIndexfile.write(str(mycorpus_appearence[x]))
+#     InvertedIndexfile(str(list_of_count[x]))
+#     InvertedIndexfile(str(final_dptp[x]))
+
+##### MAKE AN ARRAY TO APAPEND EVERYTHING TOGETHER
+
+finalappend=[]
+tempstorage=[]
+
+for x in range(length):
+    tempstorage=[]
+    tempstorage.extend(my_list_of_term_id[x])
+    tempstorage.append(mycorpus_appearence[x])
+    tempstorage.append(list_of_count[x])
+    tempstorage.extend(final_dptp[x])
+    finalappend.append(tempstorage)
+
+
+print(mycorpus_appearence)
+
+for i in finalappend:
+    InvertedIndexfile.write("%s\n" % i)
