@@ -1,2 +1,4 @@
 1    clueweb12-0000wb-38-03936.txt
 2    clueweb12-0000wb-45-25173.txt
+3    clueweb12-0000wb-53-08504.txt
+4    clueweb12-0000wb-75-23846.txt
